@@ -1,6 +1,10 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
+/**
+ * @title Counter
+ * @dev Un contrat simple qui stocke un nombre et permet de l'incrémenter.
+ */
 contract Counter {
     uint256 public number;
 
