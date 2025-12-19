@@ -1,0 +1,1 @@
+forge script script/DeployCounter.s.sol:DeployCounter --rpc-url $RPC_URL --chain-id 2025 --broadcast --private-key $PRIVATE_KEY --gas-limit 2000000 -vvvv
