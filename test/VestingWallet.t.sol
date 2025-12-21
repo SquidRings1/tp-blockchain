@@ -21,7 +21,7 @@ contract VestingWalletTest is Test {
 
     address public owner;
     address public beneficiary1;
-    uint256 public startTime = 1000;
+    uint256 public startTime = block.timestamp;
 
     uint256 constant AMOUNT = 1;
     uint256 constant CLIFF = 30 days;
@@ -52,6 +52,16 @@ contract VestingWalletTest is Test {
 
     // Test 2: Tenter de réclamer des jetons avant la date de cliff
     function testCannotClaimBeforeCliff() public {
+        vesting.createVestingSchedule(beneficiary1, AMOUNT, CLIFF, DURATION);
+
+        vm.warp(startTime - 1);
+        vm.prank(beneficiary1);
+        vm.expectRevert("ERROR: Aucun jeton disponible a reclamer !!!");
+        vesting.claimVestedTokens();
+    }
+
+    // Test 3: Tenter de réclamer des jetons avant la date de cliff
+    function testClaimAfterVestingComplete() public {
         vesting.createVestingSchedule(beneficiary1, AMOUNT, CLIFF, DURATION);
 
         vm.warp(startTime - 1);
