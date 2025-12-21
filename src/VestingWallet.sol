@@ -55,6 +55,8 @@ contract VestingWallet is Ownable, ReentrancyGuard {
         uint256 vestedAmount = getVestedAmount(msg.sender);
         uint256 claimableAmount = vestedAmount - schedule.releasedAmount;
 
+        require(claimableAmount > 0, "ERROR: Aucun jeton disponible a reclamer !!!");
+
         // prepation de l'envoie du motant
         schedule.releasedAmount += claimableAmount;
 
