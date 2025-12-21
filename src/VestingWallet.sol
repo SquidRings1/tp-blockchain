@@ -70,11 +70,15 @@ contract VestingWallet is Ownable, ReentrancyGuard {
         // Fonction pour calculer le montant total de jetons libérés à un instant T.
         // Attention : la libération est linéaire après le cliff.
         VestingSchedule storage schedule = vestingSchedules[msg.sender];
-        // return schedule.totalAmount;
 
+        if (block.timestamp < schedule.cliff)
+            return 0;
+
+        if (block.timestamp >= schedule.cliff + schedule.duration)
+            return schedule.totalAmount;
+        
         uint256 timePassedSinceCliff = block.timestamp - schedule.cliff;
         uint256 vestedAmount = (schedule.totalAmount * timePassedSinceCliff) / schedule.duration;
-    
         return vestedAmount;
     }
 }
