@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract VestingWallet is Ownable, ReentrancyGuard {
-
     struct VestingSchedule {
         address beneficiary;
         uint256 cliff;
@@ -27,7 +26,10 @@ contract VestingWallet is Ownable, ReentrancyGuard {
         token = IERC20(tokenAddress);
     }
 
-    function createVestingSchedule(address _beneficiary, uint256 _totalAmount, uint256 _cliff, uint256 _duration) public onlyOwner {
+    function createVestingSchedule(address _beneficiary, uint256 _totalAmount, uint256 _cliff, uint256 _duration)
+        public
+        onlyOwner
+    {
         // Logique pour créer et stocker un nouveau calendrier de vesting.
         // N'oubliez pas de vérifier que les fonds sont bien transférés au contrat !
         require(_totalAmount > 0, "ERROR: Montant doit etre superieur a 0 !!!");
@@ -38,7 +40,7 @@ contract VestingWallet is Ownable, ReentrancyGuard {
         require(token.transferFrom(msg.sender, address(this), _totalAmount), "ERROR: transfert a echoue !!!");
 
         // creation d'un vestingSchedules pour le beneficiary à partir de la struct
-        vestingSchedules[_beneficiary] = VestingSchedule ({
+        vestingSchedules[_beneficiary] = VestingSchedule({
             beneficiary: _beneficiary,
             cliff: _cliff,
             duration: _duration,
@@ -74,12 +76,14 @@ contract VestingWallet is Ownable, ReentrancyGuard {
         // Attention : la libération est linéaire après le cliff.
         VestingSchedule storage schedule = vestingSchedules[_beneficiary];
 
-        if (block.timestamp < schedule.cliff)
+        if (block.timestamp < schedule.cliff) {
             return 0;
+        }
 
-        if (block.timestamp >= schedule.cliff + schedule.duration)
+        if (block.timestamp >= schedule.cliff + schedule.duration) {
             return schedule.totalAmount;
-        
+        }
+
         uint256 timePassedSinceCliff = block.timestamp - schedule.cliff;
         uint256 vestedAmount = (schedule.totalAmount * timePassedSinceCliff) / schedule.duration;
         return vestedAmount;

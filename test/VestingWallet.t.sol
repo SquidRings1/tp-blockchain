@@ -6,8 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {VestingWallet} from "../src/VestingWallet.sol";
 
 contract theKoken is ERC20 {
-    constructor() ERC20 ("xwingtoken", "XT") {
-        _mint(msg.sender, 1000000 * 10**18);
+    constructor() ERC20("xwingtoken", "XT") {
+        _mint(msg.sender, 1000000 * 10 ** 18);
     }
 
     function mint(address to, uint256 amount) public {
@@ -39,7 +39,8 @@ contract VestingWalletTest is Test {
     // Test 1: Vérifier que la création d'un calendrier de vesting
     function testCreateVesting() public {
         vesting.createVestingSchedule(beneficiary1, AMOUNT, CLIFF, DURATION);
-        (address beneficiary, uint256 cliff, uint256 duration, uint256 totalAmount, uint256 releasedAmount) = vesting.vestingSchedules(beneficiary1);
+        (address beneficiary, uint256 cliff, uint256 duration, uint256 totalAmount, uint256 releasedAmount) =
+            vesting.vestingSchedules(beneficiary1);
 
         // asserts
         assertEq(beneficiary, beneficiary1, "ERROR: le Beneficiary doit matcher !!!");
@@ -68,10 +69,11 @@ contract VestingWalletTest is Test {
 
         vm.prank(beneficiary1);
         vesting.claimVestedTokens();
-        
+
         // asserts
         assertEq(token.balanceOf(beneficiary1), AMOUNT);
-        (address beneficiary, uint256 cliff, uint256 duration, uint256 totalAmount, uint256 releasedAmount) = vesting.vestingSchedules(beneficiary1);
+        (address beneficiary, uint256 cliff, uint256 duration, uint256 totalAmount, uint256 releasedAmount) =
+            vesting.vestingSchedules(beneficiary1);
         assertEq(releasedAmount, totalAmount);
     }
 }
