@@ -7,6 +7,7 @@ import "../src/VestingWallet.sol";
 
 contract DeployVestingWallet is Script {
     function run() external {
+        // obtention du token ERC20 depuis le .env
         address tokenAddress = vm.envUint("TOKEN_ADDRESS");
         vm.startBroadcast();
         new VestingWallet(tokenAddress);

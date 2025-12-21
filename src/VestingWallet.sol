@@ -18,6 +18,9 @@ contract VestingWallet is Ownable, ReentrancyGuard {
     IERC20 public immutable token;
     mapping(address => VestingSchedule) public vestingSchedules;
 
+    // pour que le forge test fonctionne...
+    event releaseTokens(address indexed beneficiary, uint256 amount);
+
     constructor(address tokenAddress) Ownable(msg.sender) {
         // ???
         require(tokenAddress != address(0), "ERROR: Token invalide !!!");
@@ -27,6 +30,9 @@ contract VestingWallet is Ownable, ReentrancyGuard {
     function createVestingSchedule(address _beneficiary, uint256 _totalAmount, uint256 _cliff, uint256 _duration) public onlyOwner {
         // Logique pour créer et stocker un nouveau calendrier de vesting.
         // N'oubliez pas de vérifier que les fonds sont bien transférés au contrat !
+        require(_totalAmount > 0, "ERROR: Montant doit etre superieur a 0 !!!");
+        require(_duration > 0, "ERROR: Duration doit etre superieure a 0 !!!");
+        require(vestingSchedules[_beneficiary].totalAmount == 0, "ERROR: Vesting existe deja pour ce beneficiaire !!!");
 
         // transfert des tokens au contract pour que l'utilisateur peut le récuperer
         require(token.transferFrom(msg.sender, address(this), _totalAmount), "ERROR: transfert a echoue !!!");
@@ -53,11 +59,11 @@ contract VestingWallet is Ownable, ReentrancyGuard {
         schedule.releasedAmount += claimableAmount;
 
         // transfert des tokens vers le beneficière en forme de condition
-        require(token.transferFrom(msg.sender, claimableAmount), "ERROR: transfert a echoue !!!");
+        require(token.transfer(msg.sender, claimableAmount), "ERROR: transfert a echoue !!!");
 
         // envoyer à la personne qui à appeller le contract la somme définie
-        //emit releaseTokens(msg.sender, claimableAmount);
-        token.transfer(msg.sender, claimableAmount);
+        emit releaseTokens(msg.sender, claimableAmount);
+        //token.transfer(msg.sender, claimableAmount);
     }
 
     function getVestedAmount(address _beneficiary) public view returns (uint256) {
