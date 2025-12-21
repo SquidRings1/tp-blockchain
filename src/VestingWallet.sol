@@ -18,17 +18,18 @@ contract VestingWallet is Ownable, ReentrancyGuard {
     IERC20 public immutable token;
     mapping(address => VestingSchedule) public vestingSchedules;
 
-    event createVesting(address indexed beneficiary, uint256 amount);
-    event releaseTokens(address indexed beneficiary, uint256 amount);
-
     constructor(address tokenAddress) Ownable(msg.sender) {
         // ???
+        require(tokenAddress != address(0), "ERROR: Token invalide !!!");
         token = IERC20(tokenAddress);
     }
 
     function createVestingSchedule(address _beneficiary, uint256 _totalAmount, uint256 _cliff, uint256 _duration) public onlyOwner {
         // Logique pour créer et stocker un nouveau calendrier de vesting.
         // N'oubliez pas de vérifier que les fonds sont bien transférés au contrat !
+
+        // transfert des tokens au contract pour que l'utilisateur peut le récuperer
+        require(token.transferFrom(msg.sender, address(this), _totalAmount), "ERROR: transfert a echoue !!!");
 
         // creation d'un vestingSchedules pour le beneficiary à partir de la struct
         vestingSchedules[_beneficiary] = VestingSchedule ({
@@ -39,9 +40,6 @@ contract VestingWallet is Ownable, ReentrancyGuard {
             // car on viens de créer le contrat
             releasedAmount: 0
         });
-        // transfert des tokens au contract pour que l'utilisateur peut le récuperer
-        require(token.transferFrom(msg.sender, address(this), _totalAmount), "Transfer failed");
-        emit createVesting(_beneficiary, _totalAmount);
     }
 
     function claimVestedTokens() public nonReentrant {
@@ -55,10 +53,11 @@ contract VestingWallet is Ownable, ReentrancyGuard {
         schedule.releasedAmount += claimableAmount;
 
         // transfert des tokens vers le beneficière en forme de condition
-        require(token.transferFrom(msg.sender, claimableAmount), "Transfer failed");
+        require(token.transferFrom(msg.sender, claimableAmount), "ERROR: transfert a echoue !!!");
 
         // envoyer à la personne qui à appeller le contract la somme définie
-        emit releaseTokens(msg.sender, claimableAmount);
+        //emit releaseTokens(msg.sender, claimableAmount);
+        token.transfer(msg.sender, claimableAmount);
     }
 
     function getVestedAmount(address _beneficiary) public view returns (uint256) {
