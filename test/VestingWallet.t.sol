@@ -50,7 +50,7 @@ contract VestingWalletTest is Test {
         assertEq(token.balanceOf(address(vesting)), AMOUNT);
     }
 
-    // Test 3: Tenter de réclamer des jetons avant la date de cliff
+    // Test 2: Tenter de réclamer des jetons avant la date de cliff
     function testCannotClaimBeforeCliff() public {
         vesting.createVestingSchedule(beneficiary1, AMOUNT, CLIFF, DURATION);
 
