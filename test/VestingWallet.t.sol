@@ -60,15 +60,16 @@ contract VestingWalletTest is Test {
         vesting.claimVestedTokens();
     }
 
-    // Test 3: Réclamer tous les jetons APRÈS la fin de la période de vesting
+    // Test 3: Réclamer tous les jetons après la fin de la période de vesting
     function testClaimAfterVestingComplete() public {
         vesting.createVestingSchedule(beneficiary1, AMOUNT, CLIFF, DURATION);
 
         vm.warp(startTime + CLIFF + DURATION);
-        
+
         vm.prank(beneficiary1);
         vesting.claimVestedTokens();
         
+        // asserts
         assertEq(token.balanceOf(beneficiary1), AMOUNT);
         (address beneficiary, uint256 cliff, uint256 duration, uint256 totalAmount, uint256 releasedAmount) = vesting.vestingSchedules(beneficiary1);
         assertEq(releasedAmount, totalAmount);
