@@ -9,6 +9,10 @@ contract theKoken is ERC20 {
     constructor() ERC20 ("xwingtoken", "XT") {
         _mint(msg.sender, 1000000 * 10**18);
     }
+
+    function mint(address to, uint256 amount) public {
+        _mint(to, amount);
+    }
 }
 
 contract VestingWalletTest is Test {
@@ -49,9 +53,10 @@ contract VestingWalletTest is Test {
     // Test 3: Tenter de réclamer des jetons avant la date de cliff
     function testCannotClaimBeforeCliff() public {
         vesting.createVestingSchedule(beneficiary1, AMOUNT, CLIFF, DURATION);
-        
+
         vm.warp(startTime - 1);
         vm.prank(beneficiary1);
+        vm.expectRevert("ERROR: Aucun jeton disponible a reclamer !!!");
         vesting.claimVestedTokens();
     }
 }

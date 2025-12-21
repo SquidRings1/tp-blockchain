@@ -52,6 +52,7 @@ contract VestingWallet is Ownable, ReentrancyGuard {
         // Logique pour permettre à un bénéficiaire de réclamer les jetons déjà libérés.
         // Calculez le montant disponible et transférez-le.
         VestingSchedule storage schedule = vestingSchedules[msg.sender];
+
         uint256 vestedAmount = getVestedAmount(msg.sender);
         uint256 claimableAmount = vestedAmount - schedule.releasedAmount;
 
@@ -71,7 +72,7 @@ contract VestingWallet is Ownable, ReentrancyGuard {
     function getVestedAmount(address _beneficiary) public view returns (uint256) {
         // Fonction pour calculer le montant total de jetons libérés à un instant T.
         // Attention : la libération est linéaire après le cliff.
-        VestingSchedule storage schedule = vestingSchedules[msg.sender];
+        VestingSchedule storage schedule = vestingSchedules[_beneficiary];
 
         if (block.timestamp < schedule.cliff)
             return 0;
